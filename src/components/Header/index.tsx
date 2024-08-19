@@ -1,6 +1,6 @@
 import LogoutIcon from "@mui/icons-material/Logout";
 import { signOut } from "firebase/auth";
-import { auth } from "../../utill/firebase";
+import { auth } from "../../util/firebase";
 import { setUser } from "../../slices/authSlice";
 import { useDispatch } from "react-redux";
 

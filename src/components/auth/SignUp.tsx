@@ -6,15 +6,17 @@ import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { Control, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z as zod } from "zod";
 
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from "../../utill/firebase";
+import { auth, db } from "../../util/firebase";
 import WithFormInput from "../../Forms/widgets/WithFormInput";
 import WithFormSelect from "../../Forms/widgets/WithFormSelect";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
+import { collection, doc, setDoc } from "firebase/firestore";
+import useUser from "../../hooks/useUser";
 
 const schema = zod.object({
   userName: zod.string().min(1, { message: "First name is required" }),
@@ -35,18 +37,16 @@ const defaultValues = {
 } satisfies Values;
 
 export function SignUpForm(): React.JSX.Element {
+  const { user, userloading } = useUser();
   const [isPending, setIsPending] = React.useState<boolean>(false);
+  const location = useLocation();
 
   const {
+    control,
     handleSubmit,
     setError,
     formState: { errors },
   } = useForm<Values>({ defaultValues, resolver: zodResolver(schema) });
-
-  const control: Control<Values> = useForm<Values>({
-    defaultValues,
-    resolver: zodResolver(schema),
-  }).control;
 
   const onSubmit = React.useCallback(
     async (values: Values): Promise<void> => {
@@ -62,9 +62,18 @@ export function SignUpForm(): React.JSX.Element {
             displayName: values.userName,
           });
         }
+        const userCollection = collection(db, "user_info");
+        const userDoc = doc(userCollection, userCredential.user.uid);
+
+        await setDoc(
+          userDoc,
+          { uid: userCredential.user.uid, role: values.userType },
+          { merge: true }
+        );
         setIsPending(false);
       } catch (error) {
         const firebaseError = error as FirebaseError;
+
         setError("root", {
           type: "server",
           message: firebaseError?.message ?? "",
@@ -74,6 +83,12 @@ export function SignUpForm(): React.JSX.Element {
     },
     [setError]
   );
+  if (userloading) {
+    return <>loading....</>;
+  }
+  if (user) {
+    return <Navigate to={"/"} state={{ from: location }} replace />;
+  }
 
   return (
     <div className="flex justify-center items-center p-5">
@@ -105,6 +120,7 @@ export function SignUpForm(): React.JSX.Element {
               errors={errors}
               type={"userType"}
               options={[
+                { label: "Admin", value: "ADMIN" },
                 { label: "Team Lead", value: "TL" },
                 { label: "Developer", value: "DEV" },
                 { label: "Viewer", value: "VWR" },
@@ -122,7 +138,7 @@ export function SignUpForm(): React.JSX.Element {
                 Already have an account?
               </Typography>
               <Button type="button" variant="text">
-                <Link to="/signin">Sign In</Link>
+                <Link to="/sign_in">Sign In</Link>
               </Button>
             </div>
           </Stack>

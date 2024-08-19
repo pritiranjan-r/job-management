@@ -5,16 +5,14 @@ import { SignInForm } from "./components/auth/SignIn";
 import Header from "./components/Header";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Home from "./routes/Home";
-import useUser from "./hooks/useUser";
 
 function App() {
-  const user = useUser();
   return (
     <Router>
       <Header />
       <Routes>
-        <Route path="/signin" element={<SignInForm />} />
-        <Route path="/signup" element={<SignUpForm />} />
+        <Route path="/sign_in" element={<SignInForm />} />
+        <Route path="/sign_up" element={<SignUpForm />} />
         <Route
           path="/"
           element={

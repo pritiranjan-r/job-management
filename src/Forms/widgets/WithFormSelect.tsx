@@ -5,7 +5,13 @@ import {
   MenuItem,
   Select,
 } from "@mui/material";
-import { Controller, Control, FieldErrors, FieldValues } from "react-hook-form";
+import {
+  Controller,
+  Control,
+  FieldErrors,
+  FieldValues,
+  Path,
+} from "react-hook-form";
 
 interface WithFormSelectProps<T extends FieldValues> {
   // Add extends FieldValues

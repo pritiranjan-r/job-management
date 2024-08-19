@@ -9,14 +9,11 @@ import Typography from "@mui/material/Typography";
 import { useForm } from "react-hook-form";
 import { z as zod } from "zod";
 import WithFormInput from "../../Forms/widgets/WithFormInput";
-import { auth, db } from "../../utill/firebase";
+import { auth, db } from "../../util/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { Link, Navigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 import { FirebaseError } from "firebase/app";
-import { RootState } from "../../store";
-import { UserType } from "../../slices/authSlice";
 import useUser from "../../hooks/useUser";
 
 const schema = zod.object({
@@ -33,7 +30,6 @@ const defaultValues = {
 
 export function SignInForm(): React.JSX.Element {
   const { user, userloading } = useUser();
-  console.log(user);
   const [isPending, setIsPending] = React.useState<boolean>(false);
 
   const {
@@ -117,7 +113,7 @@ export function SignInForm(): React.JSX.Element {
                 Don't have an account?
               </Typography>
               <Button type="button" variant="text">
-                <Link to="/signup">Sign Up</Link>
+                <Link to="/sign_up">Sign Up</Link>
               </Button>
             </div>
           </Stack>
